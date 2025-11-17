@@ -1,0 +1,25 @@
+const unfollowBtns = document.querySelectorAll('[data-testid$="-unfollow"]');
+let index = 0;
+
+function randomMs(minSec, maxSec) {
+  return (Math.floor(Math.random() * (maxSec - minSec + 1)) + minSec) * 1000;
+}
+
+function unfollowNext() {
+  if (index < unfollowBtns.length) {
+    const unfollowBtn = unfollowBtns[index];
+    unfollowBtn.click();
+
+    const confirmDelay = randomMs(1, 3); // 1-3 seconds
+    setTimeout(() => {
+      const confirmBtn = document.querySelector('[data-testid="confirmationSheetConfirm"]');
+      if (confirmBtn) confirmBtn.click();
+    }, confirmDelay);
+
+    index++;
+    const nextDelay = randomMs(4, 8); // 4-8 seconds between unfollows
+    setTimeout(unfollowNext, nextDelay);
+  }
+}
+
+unfollowNext();
