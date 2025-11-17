@@ -1,0 +1,52 @@
+// start at your own authed in x[.]com/[username]/following
+// use responsibly & improve as you see fit
+
+let unfollowBtns = document.querySelectorAll('[data-testid$="-unfollow"]');
+let index = 0;
+let unfollowedCount = 0;
+const REFRESH_EVERY = 15; // refresh button list after this many unfollows
+
+function randomMs(minSec, maxSec) {
+  return (Math.floor(Math.random() * (maxSec - minSec + 1)) + minSec) * 1000;
+}
+
+function refreshButtons() {
+  unfollowBtns = document.querySelectorAll('[data-testid$="-unfollow"]');
+  index = 0;
+  console.log('Refreshed unfollow buttons — remaining:', unfollowBtns.length);
+}
+
+function unfollowNext() {
+  if (index < unfollowBtns.length) {
+    const unfollowBtn = unfollowBtns[index];
+    unfollowBtn.click();
+
+    const confirmDelay = randomMs(1, 3); // 1-3 seconds
+    setTimeout(() => {
+      const confirmBtn = document.querySelector('[data-testid="confirmationSheetConfirm"]');
+      if (confirmBtn) confirmBtn.click();
+
+      // Count this unfollow attempt and advance index after confirmation attempt
+      unfollowedCount++;
+      index++;
+
+      // After every REFRESH_EVERY unfollows, refresh the list to keep index correct
+      if (unfollowedCount > 0 && unfollowedCount % REFRESH_EVERY === 0) {
+        const refreshDelay = randomMs(2, 4); // small pause before refreshing
+        console.log(`Performed ${unfollowedCount} unfollows — refreshing in ${refreshDelay/1000}s`);
+        setTimeout(() => {
+          refreshButtons();
+          // wait a short randomized time before continuing
+          setTimeout(unfollowNext, randomMs(4, 8));
+        }, refreshDelay);
+      } else {
+        const nextDelay = randomMs(4, 8); // 4-8 seconds between unfollows
+        setTimeout(unfollowNext, nextDelay);
+      }
+    }, confirmDelay);
+  } else {
+    console.log('No more unfollow buttons found.');
+  }
+}
+
+unfollowNext();
