@@ -47,6 +47,12 @@ function Test-IsAdmin {
     return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 }
 
+function Test-RootRequiresAdmin {
+    param($Root)
+    # Hashtable dot-access throws under StrictMode when the key is absent.
+    return ($Root.ContainsKey('Admin') -and $Root['Admin'])
+}
+
 function Get-ExecutablePathFromCommand {
     param([string]$CommandLine)
 
@@ -217,7 +223,7 @@ Write-Host ''
 # Build Run name -> command maps
 $runMaps = @{}
 foreach ($root in $runRoots) {
-    if ($root.Admin -and -not $isAdmin) {
+    if ((Test-RootRequiresAdmin -Root $root) -and -not $isAdmin) {
         Write-Warning "Skipping $($root.Path) (requires elevation)."
         continue
     }
@@ -279,7 +285,7 @@ Write-Host ''
 Write-Host '--- StartupApproved (Startup GUI state) ---' -ForegroundColor Yellow
 
 foreach ($root in $approvedRoots) {
-    if ($root.Admin -and -not $isAdmin) {
+    if ((Test-RootRequiresAdmin -Root $root) -and -not $isAdmin) {
         Write-Warning "Skipping $($root.Path) (requires elevation)."
         continue
     }
