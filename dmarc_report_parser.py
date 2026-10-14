@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Simple DMARC aggregate report parser.
 # Reads *.xml and *.xml.gz in the current directory and prints pass/fail rates.
 import glob
